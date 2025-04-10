@@ -1,0 +1,2 @@
+# yazi
+My Yazi Setup
