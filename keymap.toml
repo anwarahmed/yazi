@@ -33,7 +33,7 @@ keymap = [
 	{ on = "G",          run = "arrow bot", desc = "Go to bottom" },
 
 	# Navigation
-	{ on = "<Enter>", run = "enter", desc = "Enter the child directory" }, # Custom keymap to navigate to folder instead of entering into edit mode
+	# { on = "<Enter>", run = "enter", desc = "Enter the child directory" }, # Custom keymap to navigate to folder instead of entering into edit mode
 
 	{ on = "h", run = "leave", desc = "Back to the parent directory" },
 	{ on = "l", run = "enter", desc = "Enter the child directory" },
@@ -63,7 +63,7 @@ keymap = [
 	# Operation
 	{ on = "o",         run = "open",                        desc = "Open selected files" },
 	{ on = "O",         run = "open --interactive",          desc = "Open selected files interactively" },
-	# { on = "<Enter>",   run = "open",                        desc = "Open selected files" }, # Disabling this keymap in favour of navigating on <Enter>
+	{ on = "<Enter>",   run = "open",                        desc = "Open selected files" }, # Disabling this keymap in favour of navigating on <Enter>
 	{ on = "<S-Enter>", run = "open --interactive",          desc = "Open selected files interactively" },
 	{ on = "y",         run = "yank",                        desc = "Yank selected files (copy)" },
 	{ on = "x",         run = "yank --cut",                  desc = "Yank selected files (cut)" },
