@@ -10,6 +10,10 @@ The following files can be ignored:
 - `README.md`
 - `.git`
 - `.gitignore`
+- `yazi-default.toml`
+- `keymap-default.toml`
+- `theme-dark.toml`
+- `theme-light.toml`
 
 ## Homebrew
 
