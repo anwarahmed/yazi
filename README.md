@@ -15,10 +15,16 @@ The following files can be ignored:
 - `theme-dark.toml`
 - `theme-light.toml`
 
-## Homebrew
+## macOS Homebrew
 
 ```shell
 brew install yazi ffmpeg sevenzip jq poppler fd ripgrep fzf zoxide resvg imagemagick font-symbols-only-nerd-font
+```
+
+## ArchLinux / Omarchy
+
+```shell
+sudo pacman -S yazi ffmpeg 7zip jq poppler fd ripgrep fzf zoxide resvg imagemagick
 ```
 
 ## ZSH
@@ -38,4 +44,16 @@ Add the following to `~/.zprofile`:
 ```shell
 # Yazi
 export EDITOR="nvim"
+```
+
+## Bash
+Add the following to `~/.bashrc`:
+```shell
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+	rm -f -- "$tmp"
+}
 ```
