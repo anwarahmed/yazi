@@ -104,6 +104,11 @@ fetchers = [
 	{ url = "local://*",  run = "mime.local",  prio = "high", group = "mime" },
 	{ url = "remote://*", run = "mime.remote", prio = "high", group = "mime" },
 ]
+prepend_fetchers = [
+  # Git
+  { url = "*",  run = "git", group = "git" },
+  { url = "*/", run = "git", group = "git" },
+]
 spotters = [
 	# Multi-file
 	{ mime = "multi/*", run = "multi" },
