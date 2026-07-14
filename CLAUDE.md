@@ -104,3 +104,4 @@ To switch flavor, change `use = "..."` in `theme.toml`.
 |---|---|---|
 | 2026-05-14 | `keymap.toml` | `<Enter>` changed from `open` to `plugin smart-enter` |
 | 2026-05-14 | `plugins/smart-enter.yazi/` | Added official smart-enter plugin |
+| 2026-07-14 | `tmux.conf` | Removed stray/stale `tmux.conf` an Omarchy update dropped into this folder; it was an outdated subset of the live `~/.config/tmux/tmux.conf`, so no content was lost |
