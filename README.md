@@ -12,8 +12,13 @@ The following files can be ignored:
 - `.gitignore`
 - `yazi-default.toml`
 - `keymap-default.toml`
+- `vfs-default.toml`
 - `theme-dark.toml`
 - `theme-light.toml`
+
+`yazi.toml` and `keymap.toml` only contain the settings that differ from Yazi's
+built-in preset; everything else falls back to the default. The `*-default.toml`
+files above are unmodified reference copies of that preset.
 
 ## macOS Homebrew
 

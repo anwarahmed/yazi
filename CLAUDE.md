@@ -4,6 +4,12 @@ This file documents all differences between the active config files and their
 `*-default.toml` counterparts, plus installed plugins. Update it whenever a
 setting changes.
 
+**Config style:** `yazi.toml` and `keymap.toml` contain *only* the deltas from
+Yazi's built-in preset. Yazi merges the user config over the preset, so anything
+not listed keeps its default value. Do **not** paste the full default file back
+in — that is what caused config drift on past upgrades. The `*-default.toml`
+files are kept purely as an unmodified reference copy of the preset.
+
 ---
 
 ## yazi.toml
@@ -26,20 +32,40 @@ prepend_fetchers = [
 
 ## keymap.toml
 
+Both bindings live in a single `prepend_keymap` under `[mgr]`, which takes
+priority over the preset bindings.
+
 | Key | Default | Custom | Reason |
 |---|---|---|---|
 | `<Enter>` (mgr) | `open` | `plugin smart-enter` | Navigate into dirs, open files |
+| `l` (mgr) | `enter` | `plugin smart-enter` | Same behaviour on the vim-style key |
 
 ---
 
 ## theme.toml
 
-Entire file is a customization — not present in defaults. Sets the active flavor:
+Entire file is a customization — not present in defaults. Sets the active flavor
+and the git status signs:
 
 ```toml
 [flavor]
 use = "onedark"
+
+[git]
+modified_sign  = "   modified"
+added_sign     = "      added"
+untracked_sign = "  untracked"
+ignored_sign   = "    ignored"
+deleted_sign   = "    deleted"
+updated_sign   = "    updated"
 ```
+
+The signs live here rather than in `init.lua` because this is the location the
+git plugin documents, and because the plugin re-reads `th.git` on theme reloads —
+values assigned imperatively at startup would not survive one.
+
+Note: `[git]` is a plugin-specific section, so Yazi does **not** validate its
+keys. A typo fails silently rather than erroring.
 
 The `theme-dark.toml` and `theme-light.toml` files are the yazi defaults and are
 unchanged. `theme.toml` overrides the flavor only.
@@ -48,23 +74,17 @@ unchanged. `theme.toml` overrides the flavor only.
 
 ## vfs.toml
 
-No changes from default (both contain only `[services]` with no entries).
+Removed — it was byte-identical to `vfs-default.toml` and therefore contributed
+nothing. Yazi runs fine without it. `vfs-default.toml` is retained as reference.
 
 ---
 
 ## init.lua
 
-Not a TOML config but customized. Sets custom git status signs using nerd font
-icons, then loads the git plugin:
+Not a TOML config but customized. Loads the git plugin; the status signs it uses
+are configured under `[git]` in `theme.toml`:
 
 ```lua
-th.git.modified_sign  = "   modified"
-th.git.added_sign     = "      added"
-th.git.untracked_sign = "  untracked"
-th.git.ignored_sign   = "    ignored"
-th.git.deleted_sign   = "    deleted"
-th.git.updated_sign   = "    updated"
-
 require("git"):setup()
 ```
 
@@ -73,16 +93,17 @@ require("git"):setup()
 ## Installed Plugins
 
 ### git.yazi
-- **Source:** `yazi-rs/plugins:git` rev `1db18bb`
+- **Source:** `yazi-rs/plugins:git` rev `3f2b882`
 - **Purpose:** Shows git status indicators next to files in the file list
-- **Setup:** Loaded in `init.lua` with custom nerd font signs
+- **Setup:** Loaded in `init.lua`; signs set under `[git]` in `theme.toml`
 - **Config:** `prepend_fetchers` in `yazi.toml`
 
 ### smart-enter.yazi
-- **Source:** `yazi-rs/plugins` (official, installed manually)
+- **Source:** `yazi-rs/plugins:smart-enter` rev `3f2b882`, managed by `ya pkg`
+  (listed in `package.toml`)
 - **Purpose:** Makes `<Enter>` navigate into directories and open files, rather
   than always invoking the opener
-- **Setup:** Bound to `<Enter>` in `keymap.toml`
+- **Setup:** Bound to `<Enter>` and `l` in `keymap.toml`
 - **Plugin file:** `plugins/smart-enter.yazi/main.lua`
 
 ---
@@ -91,10 +112,17 @@ require("git"):setup()
 
 | Flavor | Status | Source |
 |---|---|---|
-| `onedark` | **Active** | `BennyOe/onedark` rev `fa1da70` |
-| `flexoki-dark` | Installed, inactive | `gosxrgxx/flexoki-dark` rev `3e8cfba` |
+| `onedark` | **Active** | `BennyOe/onedark` rev `668d71d` |
 
 To switch flavor, change `use = "..."` in `theme.toml`.
+
+---
+
+## Maintenance
+
+```sh
+ya pkg upgrade   # update plugins + flavors, then commit package.toml
+```
 
 ---
 
@@ -105,3 +133,10 @@ To switch flavor, change `use = "..."` in `theme.toml`.
 | 2026-05-14 | `keymap.toml` | `<Enter>` changed from `open` to `plugin smart-enter` |
 | 2026-05-14 | `plugins/smart-enter.yazi/` | Added official smart-enter plugin |
 | 2026-07-14 | `tmux.conf` | Removed stray/stale `tmux.conf` an Omarchy update dropped into this folder; it was an outdated subset of the live `~/.config/tmux/tmux.conf`, so no content was lost |
+| 2026-08-15 | `yazi.toml`, `keymap.toml` | Reduced from full copies of the 26.5.6 preset to deltas only (~28KB → <1KB). Removes the stale `copy dirname` / `backward --far` bindings that would have broken on the 26.8.15 upgrade |
+| 2026-08-15 | `keymap.toml` | Documented the previously undocumented `l` → `plugin smart-enter` binding |
+| 2026-08-15 | `theme.toml`, `init.lua` | Moved git status signs from `init.lua` into `[git]` in `theme.toml` |
+| 2026-08-15 | `package.toml`, `plugins/` | `ya pkg upgrade`: git `1db18bb` → `3f2b882` (theme-reload refresh, retryable-fetch fix), smart-enter rev bump (contents unchanged), onedark `fa1da70` → `668d71d` (README-only; refreshed a stale hash that was aborting upgrades) |
+| 2026-08-15 | `flavors/flexoki-dark.yazi` | Removed unused inactive flavor |
+| 2026-08-15 | `vfs.toml` | Removed; identical to the default and contributed nothing |
+| 2026-08-15 | `.backup/` | Removed stale 2026-05-06 backup; git history serves this purpose |

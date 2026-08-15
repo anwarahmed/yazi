@@ -1,19 +1,14 @@
 [[plugin.deps]]
 use = "yazi-rs/plugins:git"
-rev = "1db18bb"
-hash = "c8d30a70659f1b880407e61c564ab4e8"
+rev = "3f2b882"
+hash = "336548d9f67926e12d5584f60b790f1"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:smart-enter"
-rev = "5d5c480"
+rev = "3f2b882"
 hash = "187cc58ba7ac3befd49c342129e6f1b6"
 
 [[flavor.deps]]
-use = "gosxrgxx/flexoki-dark"
-rev = "3e8cfba"
-hash = "56a96293138f09da7fae25ee405a4393"
-
-[[flavor.deps]]
 use = "BennyOe/onedark"
-rev = "fa1da70"
-hash = "b644cb6471caf78333fc1b3940ba3ca9"
+rev = "668d71d"
+hash = "1e647ba2d7c6e6f2bafe858ad9a4e50a"

@@ -1,2 +1,12 @@
 [flavor]
 use = "onedark"
+
+# Git status signs, consumed by `plugins/git.yazi`.
+# Declared here rather than in `init.lua` so they survive theme reloads.
+[git]
+modified_sign  = "   modified"
+added_sign     = "      added"
+untracked_sign = "  untracked"
+ignored_sign   = "    ignored"
+deleted_sign   = "    deleted"
+updated_sign   = "    updated"
