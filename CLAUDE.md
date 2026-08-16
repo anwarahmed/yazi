@@ -160,6 +160,41 @@ upstream, which always matches the current stable release.
 
 ---
 
+## Verifying a Change
+
+Don't reason about whether a config edit is valid — load it and look:
+
+```sh
+YAZI_CONFIG_HOME=$PWD timeout 8 yazi /tmp </dev/null 2>&1 | head
+```
+
+Without a TTY this always ends in `os error 6` (Linux) or `os error 25`; that is
+the terminal failing, not the config. A real config problem prints a
+`TOML parse error` and `Press <Enter> to continue with preset settings...`
+*before* that line. Always re-run with a deliberately planted error — appending a
+second `[mgr]` table is enough — to confirm the check actually discriminates
+instead of passing vacuously.
+
+What this check does **not** catch:
+
+- **Invalid action names.** Yazi does not validate `run = "..."` at load time. A
+  bogus action loads clean and only fails when the key is pressed. After any
+  Yazi upgrade, verify bindings by pressing them, or by diffing
+  `keymap-default.toml` against the new release.
+- **`theme.toml` errors.** It is parsed after TTY init, so its errors never
+  surface in this headless check. `[git]` is a plugin-specific section and is not
+  validated at all — a typo in a sign name fails silently.
+
+To test against the *other* machine's Yazi version without that machine, run its
+release binary directly (the zip contains both `yazi` and `ya`):
+
+```sh
+curl -sSL -o y.zip https://github.com/sxyazi/yazi/releases/download/v<TAG>/yazi-x86_64-unknown-linux-gnu.zip
+unzip -q y.zip && ./yazi-x86_64-unknown-linux-gnu/yazi --version
+```
+
+---
+
 ## Maintenance
 
 ```sh
@@ -183,3 +218,4 @@ ya pkg upgrade   # run on the OLDEST-Yazi machine, then commit package.toml
 | 2026-08-15 | `vfs.toml` | Removed; identical to the default and contributed nothing |
 | 2026-08-15 | `.backup/` | Removed stale 2026-05-06 backup; git history serves this purpose |
 | 2026-08-15 | `CLAUDE.md`, `README.md` | Documented the macOS + Omarchy split: version floor 26.5.6, `ya pkg upgrade` from the oldest-Yazi machine, and why the deltas-only style is what makes the Homebrew/Arch version skew safe |
+| 2026-08-15 | `CLAUDE.md` | Added "Verifying a Change": how to tell a real config error from the headless no-TTY noise, what that check cannot catch (action names, `theme.toml`, `[git]`), and how to test against the other machine's Yazi version |
