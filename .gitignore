@@ -47,3 +47,6 @@ lazy-lock.json
 
 # Temporary toml files
 *.toml-*
+
+# Claude Code local state and worktrees
+.claude/

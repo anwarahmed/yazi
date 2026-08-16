@@ -1,11 +1,3 @@
--- Setup Git Status Signs
-th.git                = th.git or {}
-th.git.modified_sign  = "   modified"
-th.git.added_sign     = "      added"
-th.git.untracked_sign = "  untracked"
-th.git.ignored_sign   = "    ignored"
-th.git.deleted_sign   = "    deleted"
-th.git.updated_sign   = "    updated"
-
--- Load Git Integraiton Plugin
+-- Load Git Integration Plugin
+-- Status signs are configured under `[git]` in `theme.toml`
 require("git"):setup()
