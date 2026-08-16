@@ -18,7 +18,17 @@ The following files can be ignored:
 
 `yazi.toml` and `keymap.toml` only contain the settings that differ from Yazi's
 built-in preset; everything else falls back to the default. The `*-default.toml`
-files above are unmodified reference copies of that preset.
+files above are unmodified reference copies of that preset, snapshotted at Yazi
+**26.5.6** — Yazi never loads them from the config directory, so they are safe to
+keep even on a machine running a newer release. For a reference that always
+matches the current stable release, see the [`shipped`][shipped] tag upstream.
+
+Because the config is deltas-only it is version- and platform-agnostic, which
+matters here: this repo is shared between macOS and Omarchy, and Homebrew and
+Arch are usually on different Yazi releases. Requires Yazi **26.5.6 or newer**
+(the `git.yazi` plugin declares `@since 26.5.6`).
+
+[shipped]: https://github.com/sxyazi/yazi/tree/shipped/yazi-config/preset
 
 ## macOS Homebrew
 

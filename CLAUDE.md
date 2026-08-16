@@ -118,10 +118,52 @@ To switch flavor, change `use = "..."` in `theme.toml`.
 
 ---
 
+## Multi-Machine Setup (macOS + Omarchy)
+
+This config is shared between a Mac (Homebrew) and an Omarchy/Arch machine, and
+**the two are normally on different Yazi versions** — Homebrew tracks upstream
+releases quickly while Arch lags. As of 2026-08-15: Homebrew `26.8.15`, Arch
+`26.5.6`.
+
+That skew is fine, and is the main reason `yazi.toml` / `keymap.toml` are kept as
+deltas only: a delta config inherits each machine's own preset, so both get the
+correct platform *and* version defaults automatically. Verified by loading this
+config under real `26.5.6` and `26.8.15` binaries — clean on both.
+
+Rules to keep it that way:
+
+- **Never paste the full preset back into `yazi.toml` / `keymap.toml`.** A full
+  copy pins one machine's version onto the other. The pre-2026-08-15 config did
+  this, which silently cost the Mac the renamed `copy dirpath`, `backward wide`,
+  and `forward wide` bindings — Yazi does not validate action names at load, so
+  those keys just quietly stopped working rather than erroring.
+- **Never override `[opener]`.** The preset already branches on
+  `for = "linux"` / `for = "macos"`, so `xdg-open` vs `open` is handled upstream.
+- **Minimum version: Yazi 26.5.6**, set by `git.yazi`, which declares
+  `--- @since 26.5.6`. Both machines must be at or above this.
+- **Run `ya pkg upgrade` from the machine with the *oldest* Yazi** (currently
+  Arch), then commit. Plugins declare a minimum version via `@since`; upgrading
+  from the newer machine can pull in a plugin the older one cannot run. Package
+  hashes themselves are stable across `ya` versions — verified that `ya 26.8.15`
+  and `ya 26.5.6` compute identical hashes — so `package.toml` will not
+  ping-pong between machines.
+- If `ya pkg` ever reports *"You have modified the contents of ..."* for a
+  package you never edited, it is a stale hash in `package.toml`, not real local
+  edits. Confirm with `git status`, then re-run with `--discard`.
+
+The `*-default.toml`, `theme-dark.toml` and `theme-light.toml` files are
+reference copies of the **26.5.6** preset. Yazi never loads them from the config
+directory — only `theme.toml` is read — so they cannot break either machine, but
+they do not describe the Mac's newer preset. For an accurate reference, read the
+[`shipped`](https://github.com/sxyazi/yazi/tree/shipped/yazi-config/preset) tag
+upstream, which always matches the current stable release.
+
+---
+
 ## Maintenance
 
 ```sh
-ya pkg upgrade   # update plugins + flavors, then commit package.toml
+ya pkg upgrade   # run on the OLDEST-Yazi machine, then commit package.toml
 ```
 
 ---
@@ -140,3 +182,4 @@ ya pkg upgrade   # update plugins + flavors, then commit package.toml
 | 2026-08-15 | `flavors/flexoki-dark.yazi` | Removed unused inactive flavor |
 | 2026-08-15 | `vfs.toml` | Removed; identical to the default and contributed nothing |
 | 2026-08-15 | `.backup/` | Removed stale 2026-05-06 backup; git history serves this purpose |
+| 2026-08-15 | `CLAUDE.md`, `README.md` | Documented the macOS + Omarchy split: version floor 26.5.6, `ya pkg upgrade` from the oldest-Yazi machine, and why the deltas-only style is what makes the Homebrew/Arch version skew safe |
