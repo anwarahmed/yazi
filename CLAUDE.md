@@ -67,8 +67,75 @@ values assigned imperatively at startup would not survive one.
 Note: `[git]` is a plugin-specific section, so Yazi does **not** validate its
 keys. A typo fails silently rather than erroring.
 
+### Folder icons
+
+`[icon] prepend_globs` gives `~/Developer` and `~/Work` their own icons:
+
+```toml
+[icon]
+prepend_globs = [
+  { url = "/{home,Users}/*/Developer/", text = "", fg = "#00bcd4" },
+  { url = "/{home,Users}/*/Work/",      text = "", fg = "#00bcd4" },
+]
+```
+
+Two things make these sit with the preset's own folder icons rather than beside
+them:
+
+- **Colour.** `#00bcd4` is what the preset gives every standard home folder —
+  Documents, Downloads, Music, Pictures, Videos all use it (see the `dirs` block
+  in `theme-dark.toml`).
+- **Outline, not filled.** The preset's home-folder glyphs are all line art of a
+  similar stroke weight. Most "tools" and "briefcase" glyphs in Nerd Fonts are
+  solid fills (`fa-screwdriver_wrench` U+EF70, `md-tools` U+F1064,
+  `fa-briefcase` U+F0B1) and read as heavy blobs next to them. `cod-tools`
+  (U+EB6D, wrench + screwdriver) and `oct-briefcase` (U+F491) are the outline
+  equivalents. `oct-briefcase` is literally the same family as Documents
+  (U+F401), Downloads (U+F498) and Videos (U+F447), so its stroke weight matches
+  exactly.
+
+Icon family does not need to be uniform — the preset mixes Octicons, FontAwesome
+and Codicons freely and picks per meaning. Colour and fill style are the parts
+that have to stay consistent.
+
+Don't pick these by codepoint from memory. Nerd Fonts glyph names are indexed in
+[`glyphnames.json`][glyphnames] upstream; grep that for candidates, then *render
+them and look* before committing to one — several plausible-looking names are
+unrelated icons (`cod-tools` sounds like `EAE7`, which is actually an eye-slash),
+and fill vs. outline is invisible in the config text:
+
+```sh
+magick -size 150x170 xc:'#1e222a' -font /usr/share/fonts/TTF/JetBrainsMonoNerdFont-Regular.ttf \
+  -pointsize 90 -fill '#00bcd4' -gravity center -annotate 0 "$(python3 -c 'print(chr(0xEB6D))')" out.png
+```
+
+[glyphnames]: https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/glyphnames.json
+
+
+`prepend_globs`, not `prepend_dirs`: a `dirs` rule keys off the bare folder name
+and would icon *every* `Developer`/`Work` directory on disk. Globs match the full
+path, and `Icon::matches` checks globs *before* `dirs`, so these win over the
+preset regardless of ordering.
+
+Three things about the pattern syntax (`yazi-config/src/pattern.rs`) are easy to
+get wrong, and all three fail **silently** — the rule just never fires:
+
+- **No `~` expansion.** `~/Developer/` is treated as a literal glob and matches
+  nothing. The home path has to be spelled out.
+- **The trailing `/` is what makes a pattern directory-only.** `Pattern` records
+  `is_dir` from that slash and rejects on `is_dir != self.is_dir` *before*
+  running the glob, so a dir rule without it can never match.
+- **`*` does not cross `/`** (`literal_separator` is enabled whenever the pattern
+  contains a slash), so `/{home,Users}/*/Developer/` matches exactly one path
+  segment for the username — `/home/anwar/Developer`, not
+  `/home/anwar/src/Developer`.
+
+The `{home,Users}` alternate is what keeps this working on both machines:
+`/home/<user>` on Arch, `/Users/<user>` on macOS. Matching is case-insensitive
+unless the pattern is prefixed with `\s`.
+
 The `theme-dark.toml` and `theme-light.toml` files are the yazi defaults and are
-unchanged. `theme.toml` overrides the flavor only.
+unchanged. `theme.toml` overrides the flavor, the git signs, and these icons.
 
 ---
 
@@ -185,6 +252,31 @@ What this check does **not** catch:
   surface in this headless check. `[git]` is a plugin-specific section and is not
   validated at all — a typo in a sign name fails silently.
 
+### Checking what actually rendered
+
+For anything the headless check can't reach — `theme.toml`, icons, flavor colors —
+drive Yazi in a pseudo-TTY and grep the frame it paints. `script` alone is not
+enough: it hands Yazi a 0×0 window and Yazi draws an empty frame that greps clean
+whatever you do. The window size has to be set on the pty **before** exec:
+
+```python
+master, slave = pty.openpty()
+fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", 45, 200, 0, 0))
+subprocess.Popen(["yazi", target], stdin=slave, stdout=slave, stderr=slave,
+                 env=dict(os.environ, YAZI_CONFIG_HOME=cfg, TERM="xterm-256color"))
+```
+
+Then strip the CSI/OSC escapes and inspect the codepoints around a filename.
+Ignore the two `Terminal response timeout` warnings — nothing is there to answer
+Yazi's capability queries, and it carries on and renders anyway.
+
+Because this reads the real glyph rather than the config text, it catches the
+silent failures nothing else does: a `[git]` sign typo, an icon rule that never
+fires, a flavor that didn't load. Pair it with a *negative* case — render a
+decoy directory the rule should **not** match and confirm the icon stays the
+preset default. A scoped rule that matches nothing at all looks identical to a
+working one if you only ever check the folder you expect to hit.
+
 To test against the *other* machine's Yazi version without that machine, run its
 release binary directly (the zip contains both `yazi` and `ya`):
 
@@ -219,3 +311,5 @@ ya pkg upgrade   # run on the OLDEST-Yazi machine, then commit package.toml
 | 2026-08-15 | `.backup/` | Removed stale 2026-05-06 backup; git history serves this purpose |
 | 2026-08-15 | `CLAUDE.md`, `README.md` | Documented the macOS + Omarchy split: version floor 26.5.6, `ya pkg upgrade` from the oldest-Yazi machine, and why the deltas-only style is what makes the Homebrew/Arch version skew safe |
 | 2026-08-15 | `CLAUDE.md` | Added "Verifying a Change": how to tell a real config error from the headless no-TTY noise, what that check cannot catch (action names, `theme.toml`, `[git]`), and how to test against the other machine's Yazi version |
+| 2026-08-16 | `theme.toml` | Added `[icon] prepend_globs` giving `~/Developer` ( `cod-tools`) and `~/Work` ( `oct-briefcase`) icons — outline glyphs in the preset's `#00bcd4` so they match the other home folders; scoped to the home dir by full-path glob so same-named folders elsewhere keep the preset icon |
+| 2026-08-16 | `CLAUDE.md` | Added "Checking what actually rendered": driving Yazi in a pty with an explicit `TIOCSWINSZ` to verify `theme.toml`/icon changes the headless check cannot see, and why a negative case is required |
