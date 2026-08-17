@@ -69,12 +69,14 @@ keys. A typo fails silently rather than erroring.
 
 ### Folder icons
 
-`[icon] prepend_globs` gives `~/Developer` and `~/Work` their own icons:
+`[icon] prepend_globs` gives `~/Developer`, `~/Projects` and `~/Work` their own
+icons:
 
 ```toml
 [icon]
 prepend_globs = [
   { url = "/{home,Users}/*/Developer/", text = "", fg = "#00bcd4" },
+  { url = "/{home,Users}/*/Projects/",  text = "", fg = "#00bcd4" },
   { url = "/{home,Users}/*/Work/",      text = "", fg = "#00bcd4" },
 ]
 ```
@@ -88,11 +90,12 @@ them:
 - **Outline, not filled.** The preset's home-folder glyphs are all line art of a
   similar stroke weight. Most "tools" and "briefcase" glyphs in Nerd Fonts are
   solid fills (`fa-screwdriver_wrench` U+EF70, `md-tools` U+F1064,
-  `fa-briefcase` U+F0B1) and read as heavy blobs next to them. `cod-tools`
-  (U+EB6D, wrench + screwdriver) and `oct-briefcase` (U+F491) are the outline
-  equivalents. `oct-briefcase` is literally the same family as Documents
-  (U+F401), Downloads (U+F498) and Videos (U+F447), so its stroke weight matches
-  exactly.
+  `fa-briefcase` U+F0B1, `fa-diagram_project` U+EFCE) and read as heavy blobs
+  next to them. `cod-tools` (U+EB6D, wrench + screwdriver), `oct-briefcase`
+  (U+F491) and `oct-project` (U+F502) are the outline equivalents.
+  `oct-briefcase` and `oct-project` are literally the same family as Documents
+  (`oct-repo` U+F401), Downloads (U+F498) and Videos (U+F447), so their stroke
+  weight matches exactly.
 
 Icon family does not need to be uniform — the preset mixes Octicons, FontAwesome
 and Codicons freely and picks per meaning. Colour and fill style are the parts
@@ -313,3 +316,4 @@ ya pkg upgrade   # run on the OLDEST-Yazi machine, then commit package.toml
 | 2026-08-15 | `CLAUDE.md` | Added "Verifying a Change": how to tell a real config error from the headless no-TTY noise, what that check cannot catch (action names, `theme.toml`, `[git]`), and how to test against the other machine's Yazi version |
 | 2026-08-16 | `theme.toml` | Added `[icon] prepend_globs` giving `~/Developer` ( `cod-tools`) and `~/Work` ( `oct-briefcase`) icons — outline glyphs in the preset's `#00bcd4` so they match the other home folders; scoped to the home dir by full-path glob so same-named folders elsewhere keep the preset icon |
 | 2026-08-16 | `CLAUDE.md` | Added "Checking what actually rendered": driving Yazi in a pty with an explicit `TIOCSWINSZ` to verify `theme.toml`/icon changes the headless check cannot see, and why a negative case is required |
+| 2026-08-17 | `theme.toml` | Added `~/Projects` ( `oct-project`, U+F502) to the icon globs — Octicons outline in the same `#00bcd4`, chosen over `md-folder_multiple_outline` (reads generic in a file manager) and the solid-fill `fa-diagram_project`/`fa-sitemap` |
