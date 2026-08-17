@@ -10,3 +10,25 @@ untracked_sign = "  untracked"
 ignored_sign   = "    ignored"
 deleted_sign   = "    deleted"
 updated_sign   = "    updated"
+
+# Icons for the top-level ~/Developer and ~/Work folders.
+#
+# Uses `prepend_globs` rather than `prepend_dirs` because a `dirs` rule matches
+# on bare name and would icon *every* folder called Developer/Work anywhere on
+# disk. Globs match the full path, and are checked before `dirs`, so these win
+# over the preset regardless of order.
+#
+# Pattern syntax (yazi-config/src/pattern.rs) — the non-obvious rules:
+#   - No `~` expansion. `~/Developer/` is a literal glob and matches nothing;
+#     the home path has to be spelled out.
+#   - The trailing `/` is what marks a pattern directory-only. Without it the
+#     rule silently never matches, since a dir pattern and a file pattern are
+#     compared against `is_dir` before the glob even runs.
+#   - `{home,Users}` covers both machines: /home/<user> on Arch, /Users/<user>
+#     on macOS. `*` does not cross `/`, so it matches exactly one path segment.
+#   - Matching is case-insensitive unless the pattern is prefixed with `\s`.
+[icon]
+prepend_globs = [
+  { url = "/{home,Users}/*/Developer/", text = "", fg = "#00bcd4" },
+  { url = "/{home,Users}/*/Work/",      text = "", fg = "#00bcd4" },
+]
