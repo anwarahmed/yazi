@@ -11,10 +11,10 @@ ignored_sign   = "    ignored"
 deleted_sign   = "    deleted"
 updated_sign   = "    updated"
 
-# Icons for the top-level ~/Developer and ~/Work folders.
+# Icons for the top-level ~/Developer, ~/Projects and ~/Work folders.
 #
 # Uses `prepend_globs` rather than `prepend_dirs` because a `dirs` rule matches
-# on bare name and would icon *every* folder called Developer/Work anywhere on
+# on bare name and would icon *every* folder of that name anywhere on
 # disk. Globs match the full path, and are checked before `dirs`, so these win
 # over the preset regardless of order.
 #
@@ -30,5 +30,6 @@ updated_sign   = "    updated"
 [icon]
 prepend_globs = [
   { url = "/{home,Users}/*/Developer/", text = "", fg = "#00bcd4" },
+  { url = "/{home,Users}/*/Projects/",  text = "", fg = "#00bcd4" },
   { url = "/{home,Users}/*/Work/",      text = "", fg = "#00bcd4" },
 ]
