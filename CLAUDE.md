@@ -193,7 +193,8 @@ To switch flavor, change `use = "..."` in `theme.toml`.
 This config is shared between a Mac (Homebrew) and an Omarchy/Arch machine, and
 **the two are normally on different Yazi versions** — Homebrew tracks upstream
 releases quickly while Arch lags. As of 2026-08-15: Homebrew `26.8.15`, Arch
-`26.5.6`.
+`26.5.6`. As of 2026-10-20 Arch is at `26.9.1`, which may now be *ahead* of the
+Mac. Check `yazi --version` on both before relying on "Arch is oldest" below.
 
 That skew is fine, and is the main reason `yazi.toml` / `keymap.toml` are kept as
 deltas only: a delta config inherits each machine's own preset, so both get the
@@ -317,3 +318,4 @@ ya pkg upgrade   # run on the OLDEST-Yazi machine, then commit package.toml
 | 2026-08-16 | `theme.toml` | Added `[icon] prepend_globs` giving `~/Developer` ( `cod-tools`) and `~/Work` ( `oct-briefcase`) icons — outline glyphs in the preset's `#00bcd4` so they match the other home folders; scoped to the home dir by full-path glob so same-named folders elsewhere keep the preset icon |
 | 2026-08-16 | `CLAUDE.md` | Added "Checking what actually rendered": driving Yazi in a pty with an explicit `TIOCSWINSZ` to verify `theme.toml`/icon changes the headless check cannot see, and why a negative case is required |
 | 2026-08-17 | `theme.toml` | Added `~/Projects` ( `oct-project`, U+F502) to the icon globs — Octicons outline in the same `#00bcd4`, chosen over `md-folder_multiple_outline` (reads generic in a file manager) and the solid-fill `fa-diagram_project`/`fa-sitemap` |
+| 2026-10-20 | `CLAUDE.md` | Noted Arch Yazi is now `26.9.1`, so which machine is oldest needs re-checking; the `*-default.toml` reference copies are still the 26.5.6 preset |
